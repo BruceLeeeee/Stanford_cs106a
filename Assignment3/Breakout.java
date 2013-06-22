@@ -61,6 +61,55 @@ public class Breakout extends GraphicsProgram {
 /** Runs the Breakout program. */
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
+		setup();
 	}
-
+	
+	/*
+	 * set up the board or initial state of the program
+	 */
+	private void setup() {
+		createBricks();
+		createPaddle();
+	}
+	
+	private void createBricks() {
+		double x = 0;
+		double y = 0;
+		
+		for (int i = 0; i < NBRICK_ROWS; i++) {
+			x = (WIDTH - NBRICKS_PER_ROW * (BRICK_WIDTH + BRICK_SEP) + BRICK_SEP) / 2;
+			y = BRICK_Y_OFFSET + i * (BRICK_HEIGHT + BRICK_SEP);
+			for (int j = 0; j < NBRICKS_PER_ROW; j++) {
+				GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
+				paintBrick(brick, i);
+				add(brick);
+				x += BRICK_WIDTH + BRICK_SEP;
+			}
+		}
+	}
+	
+	private void paintBrick(GRect brick, int row) {
+		brick.setFilled(true);
+		switch (row) {
+			case 0: case 1:
+				brick.setColor(Color.RED);
+				break;
+			case 2: case 3:
+				brick.setColor(Color.ORANGE);
+				break;
+			case 4: case 5:
+				brick.setColor(Color.YELLOW);
+				break;
+			case 6: case 7:
+				brick.setColor(Color.GREEN);
+				break;
+			case 8: case 9:
+				brick.setColor(Color.CYAN);
+				break;
+		}
+	}
+	
+	private void createPaddle() {
+		
+	}
 }
