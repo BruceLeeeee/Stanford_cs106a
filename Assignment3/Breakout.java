@@ -59,9 +59,13 @@ public class Breakout extends GraphicsProgram {
 
 /** Animation cycle delay */ 
 	private static final int DELAY = 10;
+	
+/** The velocity of the ball doubled after every SPEED_UP_THRESHOLD bricked cleared*/
+	private static final int SPEED_UP_THRESHOLD = 7;
 
-/* Method: run() */
-/** Runs the Breakout program. */
+
+	/* Method: run() */
+	/** Runs the Breakout program. */
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
 		setup();
@@ -104,22 +108,52 @@ public class Breakout extends GraphicsProgram {
 		y = (HEIGHT - label.getAscent()) / 2;
 		add(label, x, y);
 	}
+	
 	private boolean hitLowerWall() {
 		if (ball.getY() + ball.getHeight() >= HEIGHT)
 			return true;
 		return false;
 	}
+	
 	private void dealWithCollision() {
 		GObject collider = getCollidingObject();
 		if (collider == null) {
 			return;
 		} else if (collider == paddle) {
+			bounceClip.play();
 			vy = -vy;
-		} else {
+		} else if (collider != scoreLabel){
+			bounceClip.play();
+			addScore(collider);
+			setScoreLabel(collider);
 			remove(collider);
 			vy = -vy;
 			bricksLeft--;
+			int bricksCleared = NBRICKS_PER_ROW * NBRICK_ROWS - bricksLeft;
+			if (bricksCleared % SPEED_UP_THRESHOLD == 0)
+				speedUp();
 		}
+	}
+	
+	private void setScoreLabel(GObject brick) {
+		scoreLabel.setLabel("Score:" + Integer.toString(score));
+	}
+	
+	private void addScore(GObject brick) {
+		if (brick.getColor() == Color.RED)
+			score += 50;
+		if (brick.getColor() == Color.ORANGE)
+			score += 40;
+		if (brick.getColor() == Color.YELLOW)
+			score += 30;
+		if (brick.getColor() == Color.GREEN)
+			score += 20;
+		if (brick.getColor() == Color.CYAN)
+			score += 10;
+	}
+	
+	private void speedUp() {
+		vy *=2;
 	}
 	
 	private GObject getCollidingObject() {
@@ -153,6 +187,19 @@ public class Breakout extends GraphicsProgram {
 	private void setup() {
 		createBricks();
 		createPaddle();
+		displayGameInfo();
+	}
+	
+	/*
+	 * display the score and turns left
+	 */
+	private void displayGameInfo() {
+		double x, y;
+		score = 0;
+		scoreLabel = new GLabel("Score:" + Integer.toString(score)); 
+		x = 0;
+		y = HEIGHT - PADDLE_Y_OFFSET + PADDLE_HEIGHT;
+		add(scoreLabel, x ,y);
 	}
 	
 	private void createBricks() {
@@ -230,4 +277,7 @@ public class Breakout extends GraphicsProgram {
 	private int turnsLeft = NTURNS;
 	private int bricksLeft = NBRICKS_PER_ROW * NBRICK_ROWS;
 	private RandomGenerator rgen = RandomGenerator.getInstance();
+	private AudioClip bounceClip = MediaTools.loadAudioClip("bounce.au");
+	private int score;
+	private GLabel scoreLabel;
 }
