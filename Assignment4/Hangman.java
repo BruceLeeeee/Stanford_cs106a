@@ -14,6 +14,11 @@ import java.awt.*;
 public class Hangman extends ConsoleProgram {
 	private static final int GUESS_CHANCE = 8;
 	
+	public void init() {
+		canvas = new HangmanCanvas();
+		add(canvas);
+	}
+	
     public void run() {
 		/* You fill this in */
     	setup();
@@ -21,7 +26,8 @@ public class Hangman extends ConsoleProgram {
 	}
 
     /*
-     * set up the secret word and currentWord
+     * set up the secret word and currentWord,
+     * reset canvas
      */
     private void setup() {
     	lexicon = new HangmanLexicon();
@@ -29,6 +35,8 @@ public class Hangman extends ConsoleProgram {
     	secretWord = lexicon.getWord(index);
     	initCurrentWorld();
     	guessLeft = GUESS_CHANCE;
+    	canvas.reset();
+    	canvas.displayWord(currentWord);
     }
     
     private void initCurrentWorld() {
@@ -78,6 +86,7 @@ public class Hangman extends ConsoleProgram {
     	if (guessIsCorrect(guessedCh)) {
     		println("That guess is correct.");
     		updateCurrentWord(guessedCh);
+    		canvas.displayWord(currentWord);
     		if (secretWord.equals(currentWord))
     			return true;
     		println("The word now looks like this:" + currentWord);
@@ -86,6 +95,7 @@ public class Hangman extends ConsoleProgram {
     		
     	} else {
     		println("There are no " + guessedCh + "'s in the word.");
+    		canvas.noteIncorrectGuess(guessedCh);
     		if (guessLeft - 1 == 0)
     			return false;
     		println("The word now looks like this:" + currentWord);
@@ -142,4 +152,5 @@ public class Hangman extends ConsoleProgram {
     private String currentWord;
     private int guessLeft;
     private RandomGenerator rgen = RandomGenerator.getInstance();
+    private HangmanCanvas canvas;
 }
