@@ -54,6 +54,19 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		calculateLowerScore();
 		calculateTotal();
 		updateFinalScorecard();
+		determineWinner();
+	}
+	
+	private void determineWinner() {
+		String winner = "";
+		int max = scorecard[0][TOTAL];
+		
+		for (int i = 1; i < nPlayers; i++)
+			if (max < scorecard[i][TOTAL]) {
+				max = scorecard[i][TOTAL];
+				winner = playerNames[i];
+			}
+		display.printMessage("The winner is " + winner);
 	}
 	
 	private void calculateUpperScore() {
@@ -115,12 +128,112 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	}
 	
 	/*
+	 * check a particular dice configuration matches the corresponding category 
+	 */
+	private boolean checkCategory(int[] dice, int category) {
+		switch (category) {
+		case ONES: case TWOS: case THREES: 
+		case FOURS: case FIVES: case SIXES: 
+		case CHANCE:
+			return true;
+		case THREE_OF_A_KIND:
+			return checkThreeOfAKind(dice, category);
+		case FOUR_OF_A_KIND:
+			return checkFourOfAKind(dice, category);
+		case FULL_HOUSE:
+			return checkFullHouse(dice, category);
+		case SMALL_STRAIGHT:
+			return checkSmallStraight(dice, category);
+		case LARGE_STRAIGHT:
+			return checkLargeStraight(dice, category);
+		case YAHTZEE:
+			return checkYahtzee(dice, category);
+		}
+		
+		return false;
+	}
+	
+	private boolean checkThreeOfAKind(int[] dice, int category) {
+		for (int i = 1; i <= 6; i++)
+			if (countOccurrences(dice, i) >= 3)
+				return true;
+		return false;
+	}	
+	
+	private boolean checkFourOfAKind(int[] dice, int category) {
+		for (int i = 1; i <= 6; i++)
+			if (countOccurrences(dice, i) >= 4)
+				return true;
+		return false;
+	}
+	
+	private boolean checkFullHouse(int[] dice, int category) {
+		for (int i = 1; i <= 6; i++)
+			if (countOccurrences(dice, i) == 3)
+				for (int j = 1; j <= 6; j++)
+					if (countOccurrences(dice, j) == 2)
+						return true;
+		return false;
+	}	
+	
+	private boolean checkYahtzee(int[] dice, int category) {
+		for (int i = 1; i <= 6; i++)
+			if (countOccurrences(dice, i) == 5)
+				return true;
+		return false;
+	}
+		
+	/*
+	 * 1234
+	 * 2345
+	 * 3456
+	 */
+	private boolean checkSmallStraight(int[] dice, int category) {
+		if (countOccurrences(dice, 1) >= 1 &&
+			countOccurrences(dice, 2) >= 1 &&
+			countOccurrences(dice, 3) >= 1 &&
+			countOccurrences(dice, 4) >= 1)
+			return true;
+		if (countOccurrences(dice, 2) >= 1 &&
+			countOccurrences(dice, 3) >= 1 &&
+			countOccurrences(dice, 4) >= 1 &&
+			countOccurrences(dice, 5) >= 1)
+				return true;
+		if (countOccurrences(dice, 3) >= 1 &&
+			countOccurrences(dice, 4) >= 1 &&
+			countOccurrences(dice, 5) >= 1 &&
+			countOccurrences(dice, 6) >= 1)
+				return true;
+		return false;
+	}
+	
+	/*
+	 * 12345
+	 * 23456
+	 */
+	private boolean checkLargeStraight(int[] dice, int category) {
+		if (countOccurrences(dice, 1) >= 1 &&
+			countOccurrences(dice, 2) >= 1 &&
+			countOccurrences(dice, 3) >= 1 &&
+			countOccurrences(dice, 4) >= 1 &&
+			countOccurrences(dice, 5) >= 1)
+				return true;
+		if (countOccurrences(dice, 6) >= 1 &&
+			countOccurrences(dice, 2) >= 1 &&
+			countOccurrences(dice, 3) >= 1 &&
+			countOccurrences(dice, 4) >= 1 &&
+			countOccurrences(dice, 5) >= 1)
+				return true;
+		return false;
+	}
+	
+	/*
 	 * prototype version using YahtzeeMagicStub.checkCategory method
 	 */
 	private int calculateScore(int[] dice, int category) {
 		int score = 0;
 		
-		if (YahtzeeMagicStub.checkCategory(dice, category) == false)
+		if (checkCategory(dice, category) == false)
 			return 0;
 		//Arrays.sort(dice);
 		switch (category) {
@@ -218,6 +331,8 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 			if (categoryLogger[player][category] == false) {
 				categoryLogger[player][category] = true;
 				break;
+			} else {
+				display.printMessage("This category has been used, please choose another one");
 			}
 		}
 		
