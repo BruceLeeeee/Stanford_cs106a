@@ -20,6 +20,21 @@ public class NameSurferEntry implements NameSurferConstants {
  */
 	public NameSurferEntry(String line) {
 		// You fill this in //
+		boolean firstToken = true;
+		int count = 0;
+		
+		StringTokenizer tokenizer = new StringTokenizer(line);
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+			if (firstToken) {
+				name = token;
+				firstToken = false;
+			} else {
+				rankArray[count] = Integer.parseInt(token);
+				count++;
+			}
+		}
+		
 	}
 
 /* Method: getName() */
@@ -28,7 +43,7 @@ public class NameSurferEntry implements NameSurferConstants {
  */
 	public String getName() {
 		// You need to turn this stub into a real implementation //
-		return null;
+		return name;
 	}
 
 /* Method: getRank(decade) */
@@ -41,7 +56,7 @@ public class NameSurferEntry implements NameSurferConstants {
  */
 	public int getRank(int decade) {
 		// You need to turn this stub into a real implementation //
-		return 0;
+		return rankArray[decade];
 	}
 
 /* Method: toString() */
@@ -51,7 +66,19 @@ public class NameSurferEntry implements NameSurferConstants {
  */
 	public String toString() {
 		// You need to turn this stub into a real implementation //
-		return "";
+		String objectInfo = name + " [" + rankArray[0];
+		
+		for (int i = 1; i < rankArray.length; i++)
+			objectInfo += " " + rankArray[i];
+		objectInfo += "]";
+		
+		return objectInfo;
 	}
+	
+	/*
+	 * ivars
+	 */
+	private String name;
+	private int[] rankArray = new int[NDECADES];
 }
 

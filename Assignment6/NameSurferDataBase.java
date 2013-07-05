@@ -8,6 +8,9 @@
  * Names are matched independent of case, so that "Eric"
  * and "ERIC" are the same names.
  */
+import java.io.*;
+import java.util.*;
+import acm.util.*;
 
 public class NameSurferDataBase implements NameSurferConstants {
 	
@@ -20,6 +23,22 @@ public class NameSurferDataBase implements NameSurferConstants {
  */
 	public NameSurferDataBase(String filename) {
 		// You fill this in //
+		recordMap.clear();
+		try {
+			BufferedReader rd = new BufferedReader(new FileReader(filename));
+			while (true) {
+				String line = rd.readLine();
+				if (line == null)
+					break;
+				NameSurferEntry entry = new NameSurferEntry(line);
+				String name = entry.getName();
+				name = name.toUpperCase();
+				recordMap.put(name, entry);	
+			}
+			rd.close();
+		} catch (IOException ex) {
+			throw new ErrorException(ex);
+		}
 	}
 	
 /* Method: findEntry(name) */
@@ -30,7 +49,10 @@ public class NameSurferDataBase implements NameSurferConstants {
  */
 	public NameSurferEntry findEntry(String name) {
 		// You need to turn this stub into a real implementation //
-		return null;
+		String uppercaseName = name.toUpperCase();
+		return recordMap.get(uppercaseName);
 	}
+	
+	HashMap<String, NameSurferEntry> recordMap = new HashMap<String, NameSurferEntry>();
 }
 
