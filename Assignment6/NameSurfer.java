@@ -9,8 +9,16 @@ import acm.program.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
+public class NameSurfer extends Program implements NameSurferConstants {
 
+	/*
+	 * constructor: NameSurfer()
+	 */
+	public NameSurfer() {
+		graph = new NameSurferGraph();
+		add(graph);
+	}
+	
 /* Method: init() */
 /**
  * This method has the responsibility for reading in the data base
@@ -55,10 +63,14 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	public void actionPerformed(ActionEvent e) {
 		// You fill this in //
 		if (e.getSource() == nameField || e.getSource() == GraphButton) {
-			String objectInfo = db.findEntry(nameField.getText()).toString();
-			println("Graph: " + objectInfo);
+			//String objectInfo = db.findEntry(nameField.getText()).toString();
+			//println("Graph: " + objectInfo);
+			NameSurferEntry entry = db.findEntry(nameField.getText());
+			if (entry != null)
+				graph.addEntry(entry);
 		} else if (e.getSource() == ClearButton) {
-			println("Clear");
+			//println("Clear");
+			graph.clear();
 		}
 	}
 	
@@ -69,4 +81,5 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	private JButton GraphButton;
 	private JButton ClearButton;
 	private NameSurferDataBase db;
+	private NameSurferGraph graph;
 }
