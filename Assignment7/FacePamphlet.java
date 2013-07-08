@@ -11,9 +11,20 @@ import acm.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class FacePamphlet extends ConsoleProgram 
+public class FacePamphlet extends Program 
 					implements FacePamphletConstants {
-
+	/*
+	 * constructor
+	 */
+	private FacePamphlet() {
+		canvas = new FacePamphletCanvas();
+		add(canvas);
+	}
+	
+	public static void main(String args[]) {
+		new FacePamphlet().start();
+	}
+	
 	/**
 	 * This method has the responsibility for initializing the 
 	 * interactors in the application, and taking care of any other 
@@ -63,7 +74,7 @@ public class FacePamphlet extends ConsoleProgram
 		bob.addFriend("Mary");
 		bob.addFriend("Lucy");
 		bob.addFriend("Agnes");
-		println("bob toString: " + bob.toString());
+		//println("bob toString: " + bob.toString());
 		
 	}
 	
@@ -75,65 +86,171 @@ public class FacePamphlet extends ConsoleProgram
     public void actionPerformed(ActionEvent e) {
 		// You fill this in as well as add any additional methods
     	if (e.getSource() == AddButton) {
-    		dealWithAddCommand();
+    		handleAddCommand();
     	} else if (e.getSource() == DeleteButton) {
-    		dealWithDeleteCommand();
+    		handleDeleteCommand();
     	} else if (e.getSource() == LookupButton) {
-    		dealWithLookupCommand();
+    		handleLookupCommand();
     	} else if (e.getSource() == StatusTextField
     			|| e.getSource() == ChangeStatusButton) {
-    		if (!StatusTextField.getText().equals(""))
-    			println("Change Status: " + StatusTextField.getText());
-    		
+    		handleChangeStatusCommand();	
     	} else if (e.getSource() == PictureTextField
     			|| e.getSource() == ChangePictureButton) {
-    		if (!PictureTextField.getText().equals(""))
-    			println("Change Picture: " + PictureTextField.getText());
-    		
+    		handleChangePictureCommand();
     	} else if (e.getSource() == FriendTextField
     			|| e.getSource() == AddFriendButton) {
-    		if (!FriendTextField.getText().equals(""))
-    			println("Add Friend: " + FriendTextField.getText());
+    		handleAddFriendCommand();
     	}
-    	
 	}
     
-    private void dealWithLookupCommand() {
+    private void handleAddFriendCommand() {
+    	String friendName = FriendTextField.getText();
+    	if (FriendTextField.getText().equals(""))
+    		return;
+    	if (currentProfile != null) {
+    		if (db.containsProfile(friendName)) {
+    			addReciprocalRelationship(currentProfile, friendName);
+    		} else {
+    			canvas.showMessage(friendName + " does not exist.");
+    			//println("Profile: " + friendName + "does not exist");
+    		}
+    		//printCurrentProfile();
+    	} else {
+    		canvas.showMessage("Please select a profile to add friend");
+    		//println("Please select a profile to add a friend");
+    		//printCurrentProfile();
+    	}
+    }
+    
+    /*
+     * add Reciprocal Relationship between the person of profile and friend
+     */
+    private void addReciprocalRelationship(FacePamphletProfile profile, String friend) {
+    	if (!profile.addFriend(friend)) {
+    		//println(profile.getName() + " are " + friend + "are friends already");
+    		canvas.showMessage(profile.getName() +
+    				" already has " + friend + " as a friend.");
+    		return;
+    	} else {
+    		db.getProfile(friend).addFriend(profile.getName());
+    		canvas.displayProfile(profile);
+    		canvas.showMessage(friend + " added as a friend");
+    	}
+    }
+    
+    private void handleChangePictureCommand() {
+    	String filename = PictureTextField.getText(); 
+    	if (filename.equals(""))
+    		return;
+		if (currentProfile != null) {
+			updateProfileImage(currentProfile, filename);
+			//println("Picture updated");
+			//printCurrentProfile();
+		} else {
+			canvas.showMessage("Please select a profile to change picture");
+			//printCurrentProfile();
+		}
+    	
+    }
+    
+    private void printCurrentProfile() {
+    	if (currentProfile != null) {
+    		//println("--> Current profile: " + currentProfile.toString());
+    	} else {
+    		//println("--> No current profile");
+    	}
+    }
+    
+    private void updateProfileImage(FacePamphletProfile profile, String filename) {
+    	GImage image = null;
+    	try {
+    		image = new GImage(filename);	
+    	} catch (ErrorException ex) {
+    		//println("cannot open file + " + filename);
+    	}
+    	if (image != null) {
+    		profile.setImage(image);
+    		canvas.displayProfile(profile);
+    		canvas.showMessage("Picture updated");
+    	} else {
+    		canvas.showMessage("Unable to open image file: " + filename);
+    		//println("failed to change image");
+    	}
+    	
+    }
+    
+    private void handleChangeStatusCommand() {
+    	String status = StatusTextField.getText(); 
+    	if (status.equals(""))
+			return;
+    	if (currentProfile != null) {
+    		currentProfile.setStatus(status);
+    		canvas.displayProfile(currentProfile);
+    		canvas.showMessage("Status updated to " + status);
+    		//println("Change Status: " + StatusTextField.getText());
+    		//printCurrentProfile();
+    	} else {
+    		canvas.showMessage("Please select a profile to change status");
+    		//printCurrentProfile();
+    	}
+    	
+    }
+    
+    private void handleLookupCommand() {
     	String name = NameTextField.getText();
     	if (name.equals(""))
     		return;
     	if (db.containsProfile(name)) {
-    		println("Lookup: " + db.getProfile(name).toString());
+    		currentProfile = db.getProfile(name);
+    		canvas.displayProfile(currentProfile);
+    		canvas.showMessage("Displaying " + name);
+    		//println("Lookup: " + db.getProfile(name).toString());
     	} else {
-    		println("Lookup: profile with name " + name + " does not exist");
+    		currentProfile = null;
+    		canvas.displayProfile(currentProfile);
+    		canvas.showMessage("A profile with the name " + name + " does not exist");
+    		//println("Lookup: profile with name " + name + " does not exist");
     	}
 		
     }
     
-    private void dealWithDeleteCommand() {
+    private void handleDeleteCommand() {
     	String name = NameTextField.getText();
     	if (name.equals(""))
     		return;
+    	currentProfile = null;
     	if (db.containsProfile(name)) {
     		db.deleteProfile(name);
-    		println("Delete: profile of " + name + " deleted");
+    		canvas.displayProfile(currentProfile);
+    		canvas.showMessage("Profile of " + name + " deleted");
+    		//println("Delete: profile of " + name + " deleted");
     	} else {
-    		println("Delete: profile with name " + name + " does not exist");
+    		//println("Delete: profile with name " + name + " does not exist");
+    		canvas.displayProfile(currentProfile);
+    		canvas.showMessage("A profile with the name " + name + " does not exist");
     	}
 		
     }
     
-    private void dealWithAddCommand() {
+    private void handleAddCommand() {
     	String name = NameTextField.getText();
     	if (name.equals(""))
     		return;
     	if (db.containsProfile(name)) {
-    		println("Add: profile for " + name +
-    				" already exists: " + db.getProfile(name).toString());
+    		currentProfile = db.getProfile(name);
+    		canvas.displayProfile(currentProfile);
+    		canvas.showMessage("A profile with the name " + name + " already exists");
+    		//println("Add: profile for " + name +
+    		//		" already exists: " + db.getProfile(name).toString());
+    		//printCurrentProfile();
     	} else {
     		FacePamphletProfile profile = new FacePamphletProfile(name);
+    		currentProfile = profile;
     		db.addProfile(profile);
-    		println("Add: new profile: " + profile.toString());
+    		canvas.displayProfile(profile);
+    		canvas.showMessage("New profile created");
+    		//println("Add: new profile: " + profile.toString());
+    		//printCurrentProfile();
     	}
     }
     
@@ -151,4 +268,6 @@ public class FacePamphlet extends ConsoleProgram
     private JButton ChangePictureButton;
     private JButton AddFriendButton;
     private FacePamphletDatabase db;
+    private FacePamphletProfile currentProfile = null;
+    private FacePamphletCanvas canvas;
 }
