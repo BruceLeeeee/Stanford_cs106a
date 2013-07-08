@@ -17,6 +17,7 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 */
 	public FacePamphletDatabase() {
 		// You fill this in
+		nameProfileMap = new HashMap<String, FacePamphletProfile>();
 	}
 	
 	
@@ -28,6 +29,7 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 */
 	public void addProfile(FacePamphletProfile profile) {
 		// You fill this in
+		nameProfileMap.put(profile.getName(), profile);
 	}
 
 	
@@ -38,7 +40,7 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 */
 	public FacePamphletProfile getProfile(String name) {
 		// You fill this in.  Currently always returns null.
-		return null;
+		return nameProfileMap.get(name);
 	}
 	
 	
@@ -53,8 +55,28 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 */
 	public void deleteProfile(String name) {
 		// You fill this in
+		if (!nameProfileMap.containsKey(name))
+			return;
+		nameProfileMap.remove(name);
+		Iterator it = nameProfileMap.keySet().iterator();
+		while (it.hasNext()) {
+			FacePamphletProfile profile = nameProfileMap.get(it.next());
+			deleteAFriend(name, profile);
+		}
 	}
 
+	/*
+	 * helper method to delete a friend for a specific profile
+	 */
+	private void deleteAFriend(String friend, FacePamphletProfile profile) {
+		Iterator it = profile.getFriends();
+		while (it.hasNext()) {
+			if (it.next().equals(friend)) {
+				profile.removeFriend(friend);
+				break;
+			}	
+		}
+	}
 	
 	/** 
 	 * This method returns true if there is a profile in the database 
@@ -62,7 +84,11 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 */
 	public boolean containsProfile(String name) {
 		// You fill this in.  Currently always returns false.
-		return false;
+		return nameProfileMap.containsKey(name);
 	}
-
+	
+	/*
+	 * ivars
+	 */
+	private HashMap<String, FacePamphletProfile> nameProfileMap;  
 }

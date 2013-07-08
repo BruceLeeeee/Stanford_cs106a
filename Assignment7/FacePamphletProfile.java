@@ -20,12 +20,16 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 */
 	public FacePamphletProfile(String name) {
 		// You fill this in
+		this.name = name;
+		status = "";
+		image = null;
+		friendList = new ArrayList<String>();
 	}
 
 	/** This method returns the name associated with the profile. */ 
 	public String getName() {
 		// You fill this in.  Currently always returns the empty string.
-		return "";
+		return name;
 	}
 
 	/** 
@@ -34,12 +38,13 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * returns null. */ 
 	public GImage getImage() {
 		// You fill this in.  Currently always returns null.
-		return null;
+		return image;
 	}
 
 	/** This method sets the image associated with the profile. */ 
 	public void setImage(GImage image) {
 		// You fill this in
+		this.image = image;
 	}
 	
 	/** 
@@ -49,12 +54,13 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 */ 
 	public String getStatus() {
 		// You fill this in.  Currently always returns the empty string.
-		return "";
+		return status;
 	}
 	
 	/** This method sets the status associated with the profile. */ 
 	public void setStatus(String status) {
 		// You fill this in
+		this.status = status;
 	}
 
 	/** 
@@ -68,6 +74,9 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 */
 	public boolean addFriend(String friend) {
 		// You fill this in.  Currently always returns true.
+		if (friendList.contains(friend))
+			return false;
+		friendList.add(friend);
 		return true;
 	}
 
@@ -81,7 +90,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 */
 	public boolean removeFriend(String friend) {
 		// You fill this in.  Currently always returns false.
-		return false;
+		return friendList.remove(friend);
 	}
 
 	/** 
@@ -90,7 +99,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 */ 
 	public Iterator<String> getFriends() {
 		// You fill this in.  Currently always returns null.
-		return null;
+		return friendList.iterator();
 	}
 	
 	/** 
@@ -106,7 +115,21 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 */ 
 	public String toString() {
 		// You fill this in.  Currently always returns the empty string.
-		return "";
+		String objectInfo = name + " (" + status + "): ";
+		
+		for (int i = 0; i < friendList.size(); i++) {
+			objectInfo += friendList.get(i);
+			if (i != friendList.size() - 1)
+				objectInfo += ", ";
+		}
+		return objectInfo;
 	}
 	
+	/*
+	 * ivars
+	 */
+	private String name;
+	private String status;
+	private GImage image;
+	private ArrayList<String> friendList;
 }
