@@ -1,4 +1,3 @@
-Stanford_cs106a
+Stanford University CS106A: Programming Methodology
 ===============
-
-Stanford_cs106a
+Stanford University CS106A: Programming Methodology
