@@ -19,6 +19,10 @@ public class NameSurfer extends Program implements NameSurferConstants {
 		add(graph);
 	}
 	
+	public static void main(String args[]) {
+		new NameSurfer().start();
+	}
+	
 /* Method: init() */
 /**
  * This method has the responsibility for reading in the data base
